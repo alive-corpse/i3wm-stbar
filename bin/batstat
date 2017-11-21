@@ -1,0 +1,16 @@
+#!/bin/sh
+
+MSG='WARNING! LOW BATTERY LEVEL!'
+[ -n "$1" ] && LIM="$1" || LIM="20"
+[ -n "$2" ] && BAT="/sys/class/power_supply/$2" || BAT=`find /sys/class/power_supply/ -name 'BAT*' | head -n 1`
+RES=`cat "$BAT/uevent" | awk -F '=' '{ if ($1~/POWER_SUPPLY_STATUS/) { stat=$2":"; s=substr($2,1,1)":"}; if ($1~/POWER_SUPPLY_CAPACITY$/) { print stat" "$2"%#####"s" "$2"%" } }'`
+LEV=`echo "$RES" | sed 's/^.*#####//' | cut -d ":" -f 2 | sed 's/%//'`
+STAT=`echo "$RES" | sed 's/^.*#####//' | cut -d ":" -f 1`
+if [ "$STAT" = "D" ] && [ $LEV -lt $LIM ] ; then
+    [ -z "$(ps aux | grep -F 'i3-nagbar' | grep -F "$MSG")" ] && i3-nagbar -m "$MSG" > /dev/null 2>&1 &
+fi
+if [ "$STAT" = "C" ]; then
+    ps aux | awk '$11~/i3-nagbar/ && /'"$MSG"'/ { print "kill "$2 }' | sh
+fi
+
+echo "$RES"

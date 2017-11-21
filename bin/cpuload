@@ -1,0 +1,2 @@
+#!/bin/sh
+awk '{ print "CPU: "$1"-"$2"-"$3"#####C:"$1 }' /proc/loadavg

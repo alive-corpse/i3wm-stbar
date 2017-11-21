@@ -1,0 +1,2 @@
+#!/bin/sh
+ip address show `ip route show | awk '$1~/^default$/ { print $NF}'` | sed '/inet /!d;s/^.*inet //;s/ .*$//'

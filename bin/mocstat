@@ -1,0 +1,39 @@
+#!/bin/sh
+
+TLENGTH=60
+SLEEPMSG='MOC IS SLEEPING'
+DIVIDER=' '
+
+mocp -i 2>&1 | awk '{
+    if ($1~/FATAL_ERROR:/){
+        res="'"$SLEEPMSG"'";
+    };
+    if ($1~/State/) {
+        if ($2~/PLAY/) { res=">"};
+        if ($2~/PAUSE/) { res="||"};
+        if ($2~/STOP/) { res="'"$SLEEPMSG"'"};
+    };
+    if (res !~ /^'"$SLEEPMSG"'$/) {
+        if ($1~/File:/) { 
+            sub("File: .*/", "", $0); 
+            f=$0;
+            if (length(f) > '$TLENGTH') {
+                f=substr(f, 0, '$TLENGTH')"..."
+            }
+        };
+        if ($1~/^Title:/) { 
+            t=substr(t,8,$0);
+            if (length(t) > '$TLENGTH') { 
+                t=substr(t, 0, '$TLENGTH')"..."
+            }
+        }; 
+        if ($1~/TotalTime:/) { res=res" "$2"]"};
+        if ($1~/CurrentTime:/) { res="["$2" "res};
+    }
+} END {
+    if (res !~ /^'"$SLEEPMSG"'$/) {
+        if ( t~/^$/ ) { t = f };
+        print res"'"$DIVIDER"'"t
+    } else { print res }
+}'
+

@@ -1,0 +1,2 @@
+#!/bin/sh
+xset -q | awk '{ if ($0~/LED mask/) { if ($NF<1000) { l="En" } else { l="Ru" } }; if ($2~/Caps/) { if ( $4~/off/ ) { print l } else { print toupper(l) } } }'

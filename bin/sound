@@ -1,0 +1,2 @@
+#!/bin/sh
+amixer | grep -A4 'Simple mixer control .Master.' | awk 'END {if ($6~/on/) {st=$4} else {st="[off]"}; print $4" "$5" "$6"#####"st}'

@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# Script for i3wm status bar content generation by Evgeniy Shumilov <evgeniy.shumilov@gmail.com>
+# Fell free to email me :)
+#
+
+cd `dirname "$0"`
+cache=`find -L *.s -type f | grep '^[0-9]\+\.s\/[0-9][0-9]-[a-zA-Z0-9_]\+-[a-fA-F0-9_]\{6\}$'`
+ranges=`echo "$cache" | sed 's#\.s.*$##' | sort -u -n`
+
+upcache() {
+    if [ -n "$1" ]; then
+        for i in `echo "$cache" | grep "^$1.s" | cut -d " " -f 1`; do
+            cache="$(echo "$cache" | grep -v '^'"$i"'\($\| \)'; echo "$i `$i`")"
+        done
+    fi
+}
+
+for r in $ranges; do
+    upcache $r
+done
+
+echo '{"version":1}[[], ['
+while true; do
+    seconds=`date +%s`
+    for r in $ranges; do
+        [ $(($seconds % $r)) -eq 0 ] && upcache $r
+    done
+    res=`echo "$cache" | sed 's/^[0-9]\+\.s\///' | sort -n -k1 | sed -e 's/^.*\?-\([0-9a-fA-F]*\) \(.*\?\)/{"full_text": "\2", "color": "#\1"},/' | sed 's/#####/", "small_text": "/'` 
+    echo "[$res" | sed '$s/,$/],/'
+    sleep 1
+done
