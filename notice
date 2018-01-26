@@ -5,5 +5,6 @@ msg=`echo "$*" | cut -d " " -f 2-`
 if [ -n "$1" ] && [ -n "$2" ]; then
     $(sleep $1; i3-nagbar -t warning -m "$msg" >/dev/null) &
 else
-    ps auxw | awk '$12~/\/'"$selfname"'$/ && $13!~/^$/ { msg=""; for (i=14;i<NF+1;i++) {msg=msg" "$i}; print $2"\t"$9"\t"$13"\t"msg }' 
+    list=`ps auxw | awk '$12~/\/'"$selfname"'$/ && $13!~/^$/ { msg=""; for (i=14;i<NF+1;i++) {msg=msg" "$i}; print $2"\t"$9"\t"$13"\t"msg }'`
+    [ -n "$list" ] && echo 'PID\tStart\tWait\t Message' && echo "$list"
 fi
