@@ -1,0 +1,9 @@
+#!/bin/sh
+iface='wlp1s0'
+ip=`/sbin/ifconfig "$iface" | sed '/^[ ]*inet /!d;s/^.*inet //;s/ .*//'`
+if [ -n "$ip" ]; then
+    winfo=`/sbin/iwconfig "$iface" | sed '/\(ESSID\|Signal level\)/!d;s/^.*ESSID:"//;s/"//;s/^.*level=//;s/ //g'`
+    echo "$winfo $ip#####$ip" | xargs | sed 's/ /:/' 
+else
+    echo "NoWiFi#####X"
+fi
