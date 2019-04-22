@@ -1,0 +1,5 @@
+#!/bin/sh
+updcount=`apt list --upgradable 2>/dev/null | sed '1d' | wc -l`
+
+echo "UPDCOUNT: $updcount#####U: $updcount"
+
